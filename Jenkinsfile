@@ -2,7 +2,7 @@ pipeline {
     agent {label 'GOL'}
     triggers {
         cron('H * * * *')
-        pollscm('* * * * *')
+        pollSCM('* * * * *')
     }
         stages {
             stage('scm') {
