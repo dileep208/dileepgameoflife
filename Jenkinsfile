@@ -9,6 +9,7 @@ pipeline {
                 steps {
 
                     git branch: 'master', url: 'https://github.com/dileep208/dileepgameoflife.git'
+                    input 'Continue to the next stage? '
                 }
             }
             stage('build') {
