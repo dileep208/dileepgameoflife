@@ -15,9 +15,9 @@ pipeline {
             }
         }
         post {
-            sucess {
-                
-                archive '**/*.war'
+            success {
+
+                archive '**/gameoflife.war'
                 junit '**/TEST-*.xml'
             }
         }
