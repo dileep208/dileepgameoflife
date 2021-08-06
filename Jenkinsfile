@@ -11,8 +11,8 @@ pipeline {
             stage('scm') {
                 steps {
 
-                    git branch: "{params.BRANCH}", url: 'https://github.com/dileep208/dileepgameoflife.git'
-                    //input message: 'Continue to the next stage? ', submitter: 'dileepaws, dileepazure'
+                    git branch: '{params.BRANCH}', url: 'https://github.com/dileep208/dileepgameoflife.git'
+                //input message: 'Continue to the next stage? ', submitter: 'dileepaws, dileepazure'
                 }
             }
             stage('build') {
