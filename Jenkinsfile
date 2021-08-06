@@ -4,12 +4,15 @@ pipeline {
         cron('H * * * *')
         pollSCM('* * * * *')
     }
+    parameters {
+        string (name: 'BRANCH', defaultValue: 'master', description: 'Branch to build')
+    }
         stages {
             stage('scm') {
                 steps {
 
                     git branch: 'master', url: 'https://github.com/dileep208/dileepgameoflife.git'
-                    input 'Continue to the next stage? '
+                    //input message: 'Continue to the next stage? ', submitter: 'dileepaws, dileepazure'
                 }
             }
             stage('build') {
