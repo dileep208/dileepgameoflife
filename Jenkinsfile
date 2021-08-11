@@ -1,29 +1,72 @@
 pipeline {
-    agent {label 'GOL'}
+    agent { label 'GOL'}
+    triggers {
+        cron('H * * * *')
+        pollSCM('* * * * *')
+    }
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to build' )
+        choice(name: 'GOAL', choices: ['package', 'clean package', 'install'], description: 'maven goals')
+    }
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        retry(2)
+    }
+    environment {
+        CI_ENV = 'DEV'
+    }
     stages {
-        stage('SCM') {
+        stage('scm') {
+            environment {
+                DUMMY = 'FUN'
+            }
             steps {
-                git url: 'https://github.com/dileep208/dileepgameoflife.git'
+                mail subject: 'BUILD Started '+env.BUILD_ID, to: 'devops@qt.com', from: 'jenkins@qt.com', body: 'EMPTY BODY'
+                git branch: "${params.BRANCH}", url: 'https://github.com/asquarezone/game-of-life.git'
+                //input message: 'Continue to next stage? ', submitter: 'qtaws,qtazure'
+                echo env.CI_ENV
+                echo env.DUMMY
             }
         }
-        stage('build && SonarQube analysis') {
+        stage('build') {
             steps {
-                withSonarQubeEnv('SonarQube-sample-1') {
-                    // Optionally use a Maven environment you've configured already
-                    withMaven(maven:'Maven 3.6.0') {
-                        sh 'mvn clean package sonar:sonar'
-                    }
+                echo env.GIT_URL
+                timeout(time:10, unit: 'MINUTES') {
+                    sh "mvn ${params.GOAL}"
+                }
+                stash includes: '**/gameoflife.war', name: 'golwar'
+            }
+        }
+        stage('devserver'){
+            agent { label 'RHEL,'}
+            steps {
+                unstash name: 'golwar'
+        stage('SONAR ANALYSIS') {
+            steps{
+                withSonarQubeEnv('SONAR-8.9LTS') {
+                // requires SonarQube Scanner for Maven 3.2+
+                sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
                 }
             }
         }
-        stage("Quality Gate") {
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
-                    waitForQualityGate abortPipeline: true
-                }
-            }
+    }
+    post {
+        success {
+            archive '**/gameoflife.war'
+            junit '**/TEST-*.xml'
+            mail subject: 'BUILD Completed Successfully '+env.BUILD_ID, to: 'devops@qt.com', from: 'jenkins@qt.com', body: 'EMPTY BODY'
+        }
+        failure {
+            mail subject: 'BUILD Failed '+env.BUILD_ID+'URL is '+env.BUILD_URL, to: 'devops@qt.com', from: 'jenkins@qt.com', body: 'EMPTY BODY'
+        }
+        always {
+            echo "Finished"
+        }
+        changed {
+            echo "Changed"
+        }
+        unstable {
+            mail subject: 'BUILD Unstable '+env.BUILD_ID+'URL is '+env.BUILD_URL, to: 'devops@qt.com', from: 'jenkins@qt.com', body: 'EMPTY BODY'
         }
     }
 }
