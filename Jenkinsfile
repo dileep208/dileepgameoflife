@@ -29,22 +29,16 @@ pipeline {
                     echo env.DUMMY
                 }
             }
-            stage('build') {
-                steps {
-
-                        sh " mvn ${params.MAVEN_GOAL} "                    
-                }
-            } 
-            stage('SONAR ANALYSIS') {
-                steps {
-                    withSonarQubeEnv('SONAR-8.9LTS') {
-                        // Requires SonarQube Scanner for Maven 3.2+
-                        sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
-
+            stage('build && SonarQube analysis') {
+            steps {
+                withSonarQubeEnv('My SonarQube Server') {
+                    // Optionally use a Maven environment you've configured already
+                    withMaven(maven:'Maven 3.5') {
+                        sh 'mvn clean package sonar:sonar'
                     }
                 }
-                
             }
+        }
             
         }
         post {
