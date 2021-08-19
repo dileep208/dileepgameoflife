@@ -23,7 +23,7 @@ pipeline {
                 }
                 steps {
                     //mail subject: 'BUILD is started'+env.BUILD_ID, to: 'devops@dileep.com', from: 'jenkins@dileep.com', body: 'EMPTY BODY'
-                    git branch: "${params.BRANCH}", url: 'https://github.com/dileep208/game-of-life.git'
+                    git branch: "${params.BRANCH}", url: 'https://github.com/dileep208/dileepgameoflife.git'
                 //input message: 'Continue to the next stage? ', submitter: 'dileepaws, dileepazure'
                     echo env.CI_ENV
                     echo env.DUMMY
