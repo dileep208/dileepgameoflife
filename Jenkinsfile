@@ -1,6 +1,6 @@
 /* groovylint-disable-next-line CompileStatic */
 pipeline {
-    agent { label 'GOL' }
+    agent { label 'MASTER' }
     triggers {
         cron('H * * * *')
         // pollSCM('* * * * *')
@@ -51,7 +51,6 @@ pipeline {
             success {
                 archive '**/gameoflife.war'
                 junit '**/TEST-*.xml'
-                mail subject: 'BUILD is sucessful'+env.BUILD_ID, to: 'devops@dileep.com', from: 'jenkins@dileep.com', body: 'EMPTY BODY'
             }
 
         }
